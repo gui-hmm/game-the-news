@@ -8,6 +8,13 @@
       "when": 1739672608474,
       "tag": "0000_fair_sersi",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1739815431991,
+      "tag": "0001_open_morlun",
+      "breakpoints": true
     }
   ]
 }

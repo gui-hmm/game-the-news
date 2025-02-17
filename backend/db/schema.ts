@@ -1,8 +1,9 @@
-import { pgTable, serial, text, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
     id: serial("id").primaryKey(),
     email: text("email").unique().notNull(),
+    isAdmin: boolean("is_admin").default(false),
     created_at: timestamp("created_at").defaultNow(),
 });
 
@@ -44,4 +45,10 @@ export const messages = pgTable("messages", {
     text: text("text").notNull(),  // Texto da mensagem
     type: text("type").notNull(),  // Tipo da mensagem: "incentivo", "aviso", "parabéns"
     min_streak: integer("min_streak").notNull(),  // A partir de quantos dias mostrar
+});
+
+export const loginAttempts = pgTable("login_attempts", {
+    email: text("email").references(() => users.email).primaryKey(),  // Referência ao e-mail do usuário
+    attempts: integer("attempts").default(0),  // Número de tentativas falhadas
+    last_attempt: timestamp("last_attempt").defaultNow(),  // Data e hora da última tentativa de login
 });
