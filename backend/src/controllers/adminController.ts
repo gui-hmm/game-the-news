@@ -1,4 +1,3 @@
-// src/controllers/adminController.ts
 import { Context } from 'hono';
 import { AdminService } from '../services/adminService';
 

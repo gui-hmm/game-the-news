@@ -1,4 +1,3 @@
-// src/routes/userRoutes.ts
 import { Hono } from 'hono';
 import { authMiddleware } from '../middleware';
 import { UserController } from '../controllers/userController';

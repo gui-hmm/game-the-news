@@ -1,4 +1,3 @@
-// src/services/adminService.ts
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import { users, userStats, messages, badges, posts } from '../db/schema';

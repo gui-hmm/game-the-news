@@ -1,4 +1,3 @@
-// src/services/userService.ts
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import { users, userStats, emailOpens, messages, loginAttempts, posts } from '../db/schema';
@@ -128,7 +127,6 @@ export class UserService {
     
         const postDetails = await beehiivResponse.json();
     
-        // Verifica se o post já existe na base de dados
         const existingPost = await this.db
           .select()
           .from(posts)
@@ -136,7 +134,6 @@ export class UserService {
           .execute();
     
         if (existingPost.length > 0) {
-          // Atualiza o post existente
           await this.db.update(posts)
             .set({
               title: postDetails.title,
@@ -162,7 +159,6 @@ export class UserService {
             .where(eq(posts.id, postDetails.id))
             .execute();
         } else {
-          // Insere um novo post
           await this.db.insert(posts).values({
             id: postDetails.id,
             title: postDetails.title,

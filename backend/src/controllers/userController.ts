@@ -1,4 +1,3 @@
-// src/controllers/userController.ts
 import { Context } from 'hono';
 import { sign } from 'hono/jwt';
 import { UserService } from '../services/userService';

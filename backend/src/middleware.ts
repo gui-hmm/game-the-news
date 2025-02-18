@@ -1,4 +1,3 @@
-// src/middlewares/authMiddleware.ts
 import { verify } from 'hono/jwt';
 import { Context } from 'hono';
 
