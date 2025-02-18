@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { verify } from 'hono/jwt';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { users, userStats, messages, badges } from '../db/schema';
+import { users, userStats, messages, badges, posts } from '../db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { neon } from '@neondatabase/serverless';
 
@@ -48,9 +48,7 @@ adminRoutes.post('/admin/create-user', async (c) => {
     }
   
     return c.json({ message: 'Usuário criado com sucesso!', userId: newUser[0].id });
-});
-  
-  
+});  
 
 // Exibir todos os usuários e estatísticas
 adminRoutes.get('/admin/users', async (c) => {
@@ -65,6 +63,14 @@ adminRoutes.get('/admin/users', async (c) => {
     .execute();
 
   return c.json({ users: allUsers });
+});
+
+// Rota para exibir os dados no dashboard
+adminRoutes.get("/admin/posts", async (c) => {
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);    
+    const allPosts = await db.select().from(posts).execute();
+    return c.json(allPosts);
 });
 
 // Gerenciar badges

@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
     id: serial("id").primaryKey(),
@@ -51,4 +51,28 @@ export const loginAttempts = pgTable("login_attempts", {
     email: text("email").references(() => users.email).primaryKey(),  // Referência ao e-mail do usuário
     attempts: integer("attempts").default(0),  // Número de tentativas falhadas
     last_attempt: timestamp("last_attempt").defaultNow(),  // Data e hora da última tentativa de login
+});
+
+export const posts = pgTable("posts", {
+  id: text("id").primaryKey(),  // ID único do post, vindo da API do Beehiiv
+  title: text("title").notNull(),  // Título do post
+  subtitle: text("subtitle"),  // Subtítulo do post
+  authors: text("authors").array(),  // Array com os autores
+  created: timestamp("created").defaultNow(),  // Data de criação do post
+  status: text("status").notNull(),  // Status do post (ex: "draft", "published")
+  subject_line: text("subject_line"),  // Linha de assunto do post
+  preview_text: text("preview_text"),  // Texto de pré-visualização do post
+  slug: text("slug"),  // Slug para a URL do post
+  thumbnail_url: text("thumbnail_url"),  // URL da imagem miniatura
+  web_url: text("web_url"),  // URL pública do post
+  audience: text("audience"),  // Audiência (ex: "free", "premium")
+  platform: text("platform"),  // Plataforma onde o post será exibido (web, email, etc.)
+  content_tags: text("content_tags").array(),  // Tags associadas ao post
+  hidden_from_feed: boolean("hidden_from_feed").default(false),  // Se o post está oculto do feed
+  publish_date: timestamp("publish_date"),  // Data de publicação do post
+  displayed_date: timestamp("displayed_date"),  // Data de exibição do post
+  meta_default_description: text("meta_default_description"),  // Descrição meta padrão
+  meta_default_title: text("meta_default_title"),  // Título meta padrão
+  content: jsonb("content"),  // Conteúdo do post, em formato JSON (HTML para diferentes plataformas)
+  stats: jsonb("stats"),  // Estatísticas de engajamento (como aberturas de e-mails, cliques, etc.)
 });

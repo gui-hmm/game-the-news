@@ -1,11 +1,19 @@
 import { Hono } from 'hono';
 import { sign, verify } from 'hono/jwt';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { users, userStats, emailOpens, messages, loginAttempts } from '../db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { users, userStats, emailOpens, messages, loginAttempts, posts } from '../db/schema';
+import { eq, desc, and } from 'drizzle-orm';
 import { neon } from '@neondatabase/serverless';
 
-const userRoutes = new Hono<{ Bindings: { DATABASE_URL: string; JWT_SECRET: string }, Variables: { user?: { id: number; email: string } } }>();
+const userRoutes = new Hono<{ 
+  Bindings: { 
+    DATABASE_URL: string; 
+    JWT_SECRET: string; 
+    BEEHIIV_API_KEY: string 
+  }, Variables: { 
+    user?: { id: number; email: string } 
+  } 
+}>();
 
 userRoutes.post('/login', async (c) => {
   const { email } = await c.req.json();
@@ -89,30 +97,52 @@ userRoutes.get('/api/me', async (c) => {
 
 // Processa abertura de e-mails via Webhook
 userRoutes.post('/webhook/email-open', async (c) => {
-  const { email, id: edition_id, utm_source, utm_medium, utm_campaign, utm_channel } = await c.req.json();
+  const { email, id: edition_id, utm_source, utm_medium, utm_campaign, utm_channel, api_url } = await c.req.json();
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
 
-  let user = await db.select().from(users).where(eq(users.email, email)).execute();
+  if (!email || !edition_id || !api_url) {
+    return c.json({ error: 'Dados inválidos do webhook' }, 400);
+  }  
+
+  let user = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .execute();
+  
   let userId;
 
   if (!user.length) {
     const newUser = await db.insert(users).values({ email }).returning();
-    user = newUser;
     userId = newUser[0].id;
-    await db.insert(userStats).values({ user_id: userId, current_streak: 1, max_streak: 1, total_opens: 1, last_active: new Date() }).execute();
+    await db.insert(userStats).values({
+      user_id: userId,
+      current_streak: 1,
+      max_streak: 1,
+      total_opens: 1,
+      last_active: new Date()
+    }).execute();
   } else {
     userId = user[0].id;
   }
 
-  await db.insert(emailOpens).values({
-    user_id: userId,
-    edition_id,
-    utm_source,
-    utm_medium,
-    utm_campaign,
-    utm_channel,
-  }).execute();
+  const existingOpen = await db
+    .select()
+    .from(emailOpens)
+    .where(and(eq(emailOpens.user_id, userId), eq(emailOpens.edition_id, edition_id)))
+    .execute();
+
+  if (!existingOpen.length) {
+    await db.insert(emailOpens).values({
+      user_id: userId,
+      edition_id,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_channel
+    }).execute();
+  }
 
   const stats = await db.select().from(userStats).where(eq(userStats.user_id, userId)).execute();
   const today = new Date();
@@ -137,16 +167,95 @@ userRoutes.post('/webhook/email-open', async (c) => {
   }
 
   await db.update(userStats)
-    .set({ 
-      current_streak: newStreak, 
-      max_streak: newMaxStreak, 
-      total_opens: totalOpens, 
+    .set({
+      current_streak: newStreak,
+      max_streak: newMaxStreak,
+      total_opens: totalOpens,
       last_active: today
     })
     .where(eq(userStats.user_id, userId))
     .execute();
 
-  return c.json({ message: "Abertura registrada e streak atualizado!", newStreak });
+  // 🔹 Requisição para API da Beehiiv utilizando o link recebido no webhook
+  try {
+    const beehiivResponse = await fetch(api_url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${c.env.BEEHIIV_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!beehiivResponse.ok) {
+      throw new Error('Erro ao buscar dados do post na API do Beehiiv');
+    }
+
+    const postDetails = await beehiivResponse.json();
+
+    // Verifica se o post já existe
+    const existingPost = await db
+      .select()
+      .from(posts)
+      .where(eq(posts.id, postDetails.id))
+      .execute();
+
+    if (existingPost.length > 0) {
+      // Atualiza se o post já existe
+      await db.update(posts)
+        .set({
+          title: postDetails.title,
+          subtitle: postDetails.subtitle,
+          authors: postDetails.authors,
+          status: postDetails.status,
+          subject_line: postDetails.subject_line,
+          preview_text: postDetails.preview_text,
+          slug: postDetails.slug,
+          thumbnail_url: postDetails.thumbnail_url,
+          web_url: postDetails.web_url,
+          audience: postDetails.audience,
+          platform: postDetails.platform,
+          content_tags: postDetails.tags,
+          hidden_from_feed: postDetails.hidden_from_feed,
+          publish_date: postDetails.publish_date ? new Date(postDetails.publish_date) : null,
+          displayed_date: postDetails.displayed_date ? new Date(postDetails.displayed_date) : null,
+          meta_default_description: postDetails.meta_default_description,
+          meta_default_title: postDetails.meta_default_title,
+          content: postDetails.content,
+          stats: postDetails.stats,
+        })
+        .where(eq(posts.id, postDetails.id))
+        .execute();
+    } else {
+      // Insere um novo post
+      await db.insert(posts).values({
+        id: postDetails.id,
+        title: postDetails.title,
+        subtitle: postDetails.subtitle,
+        authors: postDetails.authors,
+        created: new Date(postDetails.created_at),
+        status: postDetails.status,
+        subject_line: postDetails.subject_line,
+        preview_text: postDetails.preview_text,
+        slug: postDetails.slug,
+        thumbnail_url: postDetails.thumbnail_url,
+        web_url: postDetails.web_url,
+        audience: postDetails.audience,
+        platform: postDetails.platform,
+        content_tags: postDetails.tags,
+        hidden_from_feed: postDetails.hidden_from_feed,
+        publish_date: postDetails.publish_date ? new Date(postDetails.publish_date) : null,
+        displayed_date: postDetails.displayed_date ? new Date(postDetails.displayed_date) : null,
+        meta_default_description: postDetails.meta_default_description,
+        meta_default_title: postDetails.meta_default_title,
+        content: postDetails.content,
+        stats: postDetails.stats,
+      }).execute();
+    }
+  } catch (error) {
+    console.error('Erro ao buscar ou salvar post:', error);
+  }
+
+  return c.json({ message: 'Abertura registrada, post atualizado e streak atualizado!', newStreak });
 });
 
 // Obtém estatísticas do usuário
