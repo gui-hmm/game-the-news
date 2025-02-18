@@ -1,0 +1,5 @@
+# Ignorar diretórios e arquivos locais
+backend/node_modules/
+backend/.wrangler/
+backend/.env
+backend/.dev.vars
