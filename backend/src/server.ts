@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import userRoutes from './routes/user';
-import adminRoutes from './routes/admin';
+import userRoutes from './routes/userRoute';
+import adminRoutes from './routes/adminRoute';
 
 const app = new Hono();
 
