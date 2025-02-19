@@ -5,14 +5,14 @@ import { UserService } from '../services/userService';
 export class UserController {
   private userService: UserService;
 
-  constructor(databaseUrl: string, private jwtSecret: string) {
-    this.userService = new UserService(databaseUrl);
+  constructor(private databaseUrl: string, private jwtSecret: string, private beehiivkey: string) {
+    this.userService = new UserService(databaseUrl, jwtSecret, beehiivkey);
   }
 
   async login(c: Context) {
     try {
-        const { email } = await c.req.json();
-        const user = await this.userService.login(email);
+        const { email, isAdmin = false } = await c.req.json();
+        const user = await this.userService.login(email, isAdmin);
         const token = await sign({ id: user.id, email: user.email, isAdmin: user.isAdmin }, this.jwtSecret);
         return c.json({ token });
     } catch (error) {

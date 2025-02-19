@@ -6,16 +6,16 @@ import { eq, desc, and } from 'drizzle-orm';
 export class UserService {
   private db: ReturnType<typeof drizzle>;
 
-  constructor(databaseUrl: string) {
+  constructor(databaseUrl: string, private jwtSecret: string, private beehiivkey: string) {
     const sql = neon(databaseUrl);
     this.db = drizzle(sql);
   }
 
-  async login(email: string) {
+  async login(email: string, isAdmin: boolean) {
     let user = await this.db.select().from(users).where(eq(users.email, email)).execute();
 
     if (!user.length) {
-      const newUser = await this.db.insert(users).values({ email }).returning();
+      const newUser = await this.db.insert(users).values({ email, isAdmin }).returning();
       user = newUser;
     }
 
@@ -49,7 +49,12 @@ export class UserService {
   }
 
   async registerEmailOpen(email: string, edition_id: string, utm_source: string, utm_medium: string, utm_campaign: string, utm_channel: string, api_url: string) {
-    let user = await this.db.select().from(users).where(eq(users.email, email)).execute();
+    let user = await this.db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .execute();
+    
     let userId;
 
     if (!user.length) {
@@ -116,7 +121,7 @@ export class UserService {
         const beehiivResponse = await fetch(api_url, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${process.env.BEEHIIV_API_KEY}`,
+            'Authorization': `Bearer ${this.beehiivkey}`,
             'Content-Type': 'application/json'
           }
         });
@@ -125,7 +130,7 @@ export class UserService {
           throw new Error('Erro ao buscar dados do post na API do Beehiiv');
         }
     
-        const postDetails = await beehiivResponse.json();
+        const postDetails : any = await beehiivResponse.json();
     
         const existingPost = await this.db
           .select()

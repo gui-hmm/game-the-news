@@ -34,7 +34,7 @@ export class AdminService {
     return await this.db
       .select({ email: users.email, streak: userStats.current_streak, max_streak: userStats.max_streak, total_opens: userStats.total_opens })
       .from(users)
-      .innerJoin(userStats, eq(users.id, userStats.user_id))
+      .leftJoin(userStats, eq(users.id, userStats.user_id))
       .orderBy(desc(userStats.current_streak))
       .execute();
   }
