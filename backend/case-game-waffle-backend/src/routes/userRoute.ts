@@ -25,12 +25,19 @@ userRoutes.post('/login', (c) => {
   return userController.login(c);
 });
 
-userRoutes.post('/webhook/email-open', (c) => {
+userRoutes.post('/', async (c) => {
   const envCheck = checkEnvVariables(c);
   if (envCheck) return c.json(envCheck, 500);
 
+  const email = c.req.query('email');
+  const id = c.req.query('id');
+
+
+  if (!email || !id) {
+    return c.json({ error: 'Email ou ID faltando na URL' }, 400);
+  }
   const userController = new UserController(c.env.DATABASE_URL, c.env.JWT_SECRET, c.env.BEEHIIV_API_KEY);
-  return userController.registerEmailOpen(c);
+  return userController.registerEmailOpen(c, email, id);
 });
 
 userRoutes.use('/api/*', authMiddleware);

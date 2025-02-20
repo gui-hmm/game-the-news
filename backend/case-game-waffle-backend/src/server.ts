@@ -6,8 +6,8 @@ const app = new Hono();
 
 app.get('/', (c) => c.text('API Rodando 🚀'));
 
-app.route('/user', userRoutes);
+app.route('/', userRoutes);
 
-app.route('/admin', adminRoutes);
+app.route('/', adminRoutes);
 
 export default app;
