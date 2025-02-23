@@ -8,7 +8,7 @@ import UserLayout from "../layouts/userLayout";
 import Button from "../components/button";
 
 const UserDashboard = () => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState<any | null>(null);
   const [ranking, setRanking] = useState<any | null>(null);
