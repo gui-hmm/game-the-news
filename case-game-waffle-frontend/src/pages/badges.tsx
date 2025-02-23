@@ -20,7 +20,7 @@ export const Badges: React.FC = () => {
         <CardContent>
           <h2 className="text-3xl font-semibold pb-6">Criar Badge</h2>
           <div className="flex justify-center">
-            <div className="flex justify-between items-center max-w-2xl w-full">
+            <div className="flex flex-col md:flex-row justify-between items-center max-w-2xl w-full space-y-4 md:space-y-0">
               <input
                 type="text"
                 value={name}

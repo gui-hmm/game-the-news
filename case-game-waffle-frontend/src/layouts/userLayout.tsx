@@ -11,7 +11,7 @@ const UserLayout = ({ children }: UserLayoutProps) => {
     <div className="flex flex-col min-h-screen">
       <UserHeader />
       <div className="flex flex-1">
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-6 overflow-y-auto max-h-screen custom-scroll">{children}</main>
       </div>
       <Footer />
     </div>

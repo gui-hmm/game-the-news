@@ -14,14 +14,14 @@ export const Messages: React.FC = () => {
     const response = await createMessage(text, type, minStreak);
     setMessage(response.error || "Mensagem criada com sucesso!");
   };
-
+  
   return (
     <AdminLayout>
       <Card>
         <CardContent>
           <h2 className="text-3xl font-semibold pb-6">Criar Mensagem</h2>
           <div className="flex justify-center">
-            <div className="flex justify-between items-center max-w-4xl w-full">
+            <div className="flex flex-col md:flex-row justify-between items-center max-w-4xl w-full space-y-4 md:space-y-0">
               <input
                 type="text"
                 value={text}
