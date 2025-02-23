@@ -1,11 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Home from "../pages/home";
+import { CreateUser } from "../pages/createUser";
 import Login from "../pages/login";
-import About from "../pages/about";
 import PrivateRoute from "./privateRoute";
 import AdminDashboard from "../pages/adminDashboard";
 import UserDashboard from "../pages/userDashboard";
 import { AuthProvider } from "../context/authContext";
+import { Badges } from "../pages/badges";
+import { Messages } from "../pages/messages";
 
 const AppRoutes = () => {
   console.log("AppRoutes: Rendering routes");
@@ -27,9 +28,28 @@ const AppRoutes = () => {
             <AdminDashboard />
           </PrivateRoute>
         } />
+        <Route 
+        path="/create-user" 
+        element={
+          <PrivateRoute>
+            <CreateUser />
+          </PrivateRoute>
+        } />
+        <Route 
+        path="/badges" 
+        element={
+          <PrivateRoute>
+            <Badges />
+          </PrivateRoute>
+        } />
+        <Route 
+        path="/messages" 
+        element={
+          <PrivateRoute>
+            <Messages />
+          </PrivateRoute>
+        } />
         <Route path="/" element={<Login />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/dashboard" element={<Home />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </AuthProvider>

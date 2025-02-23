@@ -25,7 +25,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
-        console.log("Payload do token no useEffect:", payload);
 
         setUser(payload);
         setIsAdmin(payload.isAdmin || false);
@@ -45,7 +44,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("token", token);
 
       const payload = JSON.parse(atob(token.split(".")[1]));
-      console.log("Payload do token no login:", payload);
 
       setUser(payload);
       setIsAdmin(payload.isAdmin || false);

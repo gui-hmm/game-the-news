@@ -5,18 +5,16 @@ import { useAuth } from "../context/authContext";
 const PrivateRoute = ({ children, adminOnly = false }: { children: JSX.Element, adminOnly?: boolean }) => {
   const { user, isAdmin, isLoading } = useAuth();
 
-  console.log("PrivateRoute: isLoading:", isLoading, "user:", user, "isAdmin:", isAdmin); // Log para depuração
-
   if (isLoading) {
-    return <div>Carregando...</div>; // Exibe um indicador de carregamento
+    return <div>Carregando...</div>; 
   }
 
   if (!user) {
-    return <Navigate to="/" />; // Redireciona para a página de login se não houver usuário
+    return <Navigate to="/" />;
   }
 
   if (adminOnly && !isAdmin) {
-    return <Navigate to="/user-dashboard" />; // Redireciona para o dashboard do usuário se não for admin
+    return <Navigate to="/user-dashboard" />;
   }
 
   return children;

@@ -38,4 +38,4 @@ export const fetchRanking = async (token: string) => {
 
     return response.json();
 };
-  
+
