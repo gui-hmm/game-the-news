@@ -28,14 +28,14 @@ export const CreateUser: React.FC = () => {
     const response = await createUser(email, isAdmin);
     setMessage(response.error || "Usuário criado com sucesso!");
   };
-
+  
   return (
     <AdminLayout>
       <Card>
         <CardContent>
           <h2 className="text-3xl font-semibold pb-5">Criar Usuário</h2>
           <div className="flex justify-center">
-            <div className="flex justify-between items-center max-w-2xl w-full">
+            <div className="flex flex-col md:flex-row justify-between items-center max-w-2xl w-full space-y-4 md:space-y-0">
               <input
                 type="email"
                 className="border-b-2 p-2"

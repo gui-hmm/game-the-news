@@ -9,8 +9,6 @@ import { Badges } from "../pages/badges";
 import { Messages } from "../pages/messages";
 
 const AppRoutes = () => {
-  console.log("AppRoutes: Rendering routes");
-
   return (
     <AuthProvider>
       <Routes>

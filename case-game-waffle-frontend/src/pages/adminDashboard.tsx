@@ -85,9 +85,6 @@ export default function AdminDashboard() {
         const usersResponse = await fetchUsers(token) as unknown  as ApiUserResponse;
         const postsResponse = await fetchPosts(token);
 
-        console.log("Users Data:", usersResponse);
-        console.log("Posts Data:", postsResponse);
-
         if (usersResponse?.data?.users && Array.isArray(usersResponse.data.users)) {
           setUsers(usersResponse.data.users);
         } else {
@@ -169,7 +166,7 @@ export default function AdminDashboard() {
             <Card>
               <CardContent>
                 <h2 className="text-xl font-semibold mb-3 text-black">Usuários</h2>
-                <table className="w-full border-collapse border border-gray-300">
+                <table className="w-full border-collapse border border-gray-300 overflow-x-auto">
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="border p-2">Email</th>
