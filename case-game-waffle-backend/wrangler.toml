@@ -1,0 +1,15 @@
+name = "case-game-waffle"
+type = "javascript"
+
+[env.dev]
+DATABASE_URL = "postgresql://neondb_owner:npg_6jR9TGbJdhNf@ep-fragrant-frost-a8pnt0s1-pooler.eastus2.azure.neon.tech/neondb?sslmode=require"
+JWT_SECRET = "01se23gre456do789"
+BEEHIIV_API_KEY = "a13548d8-da5f-4f61-bba2-f344222e9ecf"
+
+[env.production]
+DATABASE_URL = "postgresql://neondb_owner:npg_6jR9TGbJdhNf@ep-fragrant-frost-a8pnt0s1-pooler.eastus2.azure.neon.tech/neondb?sslmode=require"
+JWT_SECRET = "01se23gre456do789"
+BEEHIIV_API_KEY = "a13548d8-da5f-4f61-bba2-f344222e9ecf"
+
+[build]
+command = "npm install"
