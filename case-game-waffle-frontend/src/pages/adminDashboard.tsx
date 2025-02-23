@@ -3,7 +3,6 @@ import { Card, CardContent } from "../components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line } from "recharts";
 import AdminLayout from "../layouts/adminLayout";
 import { fetchUsers, fetchPosts } from "../services/adminService";
-import { useAuth } from "../context/authContext";
 
 interface User {
   email: string;
@@ -72,13 +71,7 @@ interface ApiUserResponse {
   };
 }
 
-interface ApiPostResponse {
-  data: Post[]; // `data` é um array de posts
-  error?: string; // Campo opcional para erros
-}
-
 export default function AdminDashboard() {
-  const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +88,6 @@ export default function AdminDashboard() {
         console.log("Users Data:", usersResponse);
         console.log("Posts Data:", postsResponse);
 
-        // Ajuste para usersResponse.data.users
         if (usersResponse?.data?.users && Array.isArray(usersResponse.data.users)) {
           setUsers(usersResponse.data.users);
         } else {
@@ -104,11 +96,9 @@ export default function AdminDashboard() {
         }
 
         if (Array.isArray(postsResponse)) {
-          // Se a resposta for diretamente um array de posts
           setPosts(postsResponse);
         }
         else if (postsResponse && 'data' in postsResponse && Array.isArray(postsResponse.data)) {
-          // Se a resposta tiver um campo `data` que é um array de posts
           setPosts(postsResponse.data);
         } 
         else {
@@ -126,7 +116,6 @@ export default function AdminDashboard() {
     loadData();
   }, [token]);
 
-  // Gráfico de Status dos Posts
   const postStatusCount = posts.reduce((acc, post) => {
     acc[post.status] = (acc[post.status] || 0) + 1;
     return acc;
@@ -137,7 +126,6 @@ export default function AdminDashboard() {
     value: count,
   }));
 
-  // Gráfico de Clicks e Visualizações por Post
   const postPerformanceData = posts.map((post) => ({
     title: post.title,
     emailClicks: post.stats.email.clicks,
@@ -145,7 +133,6 @@ export default function AdminDashboard() {
     webViews: post.stats.web.views,
   }));
 
-  // Gráfico de Taxa de Abertura de Emails
   const emailOpenRateData = posts.map((post) => {
     const uniqueOpens = post.stats.email.unique_opens || 0;
     const recipients = post.stats.email.recipients || 0;
@@ -156,7 +143,6 @@ export default function AdminDashboard() {
     };
   });
 
-  // Gráfico de Desempenho por Plataforma
   const platformPerformanceData = posts.reduce((acc, post) => {
     const views = post.stats.web.views;
     acc[post.platform] = (acc[post.platform]) + views;

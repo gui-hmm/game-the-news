@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 
 const Sidebar = () => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <aside className="bg-gray text-white w-64 p-4 min-h-screen">
